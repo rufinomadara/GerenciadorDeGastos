@@ -1,0 +1,36 @@
+
+<!-- chama o header primeiro -->
+<?php require VIEWS_PATH . 'includes/header.phtml';?>
+
+<!--Chama a main principal chamada "home" -->
+<div class="container">
+
+<!-- Main component for a primary marketing message or call to action -->
+<div class="jumbotron">
+  <h1>Bem-vindo ao Projeto!</h1>
+  <p>
+    Projeto Desenvolvendo Página Web com PHP Orientado a Objetos.
+  </p>
+  <p>
+    <a class="btn btn-lg btn-primary" href="http://bit.ly/ce-learn" role="button">Saiba mais &raquo;</a>
+  </p>
+</div>
+
+<div class="col-md-12">
+ 
+  <?php foreach($this->products as $product):?><!-- Cria um array -->
+    <div class="col-md-4">
+      <img src="http://via.placeholder.com/350x150?text=<?=$product['name'];?>" alt="" class="img-responsive">
+      <h2><a href="<?=HOME;?>/product/<?=$product['id'];?>"><?=$product['name'];?></a></h2>
+      <p><?=$product['description'];?></p>
+      <p><?=number_format($product['price'], 2, ',', '.');?></p>
+      <!--                         decimals: 2, dec_point: ',', thousands_sep:'.');?></p> -->
+    </div>
+  <?php endforeach;?><!-- fim do array-->
+  
+</div>
+
+</div> <!-- /container -->
+
+<!-- chama o footer -->
+<?php require VIEWS_PATH . 'includes/footer.phtml';?>
