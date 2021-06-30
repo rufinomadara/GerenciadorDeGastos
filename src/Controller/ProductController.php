@@ -19,10 +19,16 @@ class ProductController{
 
     //os binds vão vir dessa linha da chave nomeada name
     //var_dump((new Product($pdo))->where(['name' => 'Antonio', 'email' => 'rufino']));
-
-    var_dump((new Product($pdo))->insert(
-      ['name' => 'Antonio', 'price' => 19.99]
+    
+    var_dump((new Product($pdo))->where(
+      ['id' => 12]
     ));
+  
+    /*
+    var_dump((new Product($pdo))->insert(
+      ['name' => 'Antonio', 'price' => 19.99, 'amount' => 10, 'description'=>'Testando o código', 'slug' => 'slug']
+    ));
+   */
 
     //$view->product = (new Product($pdo))->find($id);
 

@@ -64,12 +64,7 @@ abstract class Entity
       //concatena com o select do $sql com o $where
       $sql .= $where;
 
-      $get = $this->conn->prepare($sql);
-      //vetor que pega as keys e as linhas dos valores
-      foreach ($conditions as $k => $v){
-        gettype($v) == 'int' ? $get->bind(':' . $k, $v, \PDO::PARAM_INT)
-                             : $get->bind(':' . $k, $v, \PDO::PARAM_STR);
-      }
+      $get = $this->bind($sql, $conditions);
 
       $get->execute();
 
@@ -82,12 +77,37 @@ abstract class Entity
 
       $binds = array_keys($data);
       //$fields = implode(glue: ', ', $binds);
-      $fields = implode(', ', $binds);
+      //pode adicionar fields diretamente
+      //$fields = implode(', ', $binds);
+      //      $sql = 'INSERT INTO ' . $this->table . '('. implode(glue:', ', $binds) . '
+      //) VALUES(:' . implode(glue:', :', $binds) . ')';
 
-      //$sql = 'INSERT INTO ' . $this->table . '('. $fields . ') VALUE(' . implode(glue:', :', $binds) . ')';
-      $sql = 'INSERT INTO ' . $this->table . '('. $fields . ') VALUE(' . implode(', :', $binds) . ')';
+      $sql = 'INSERT INTO ' . $this->table . '('. implode(', ', $binds) . ', created_at, updated_at
+      ) VALUES(:' . implode(', :', $binds) . ', NOW(), NOW())';
  
-      print $sql;
+       $insert = $this->bind($sql, $data);
+
+       return $insert->execute();
+
+      //exibi o que está sendo passado pelo mysql
+      //print $sql;
+  }
+
+  public function update($data){
+    $sql = 'UPDATE ' . $this->table . ' SET name = :name'
+  }
+
+  private function bind($sql, $data){
+
+    $bind = $this->conn->prepare($sql); 
+
+    //vetor que pega as keys e as linhas dos valores
+    foreach ($data as $k => $v){
+      gettype($v) == 'int' ? $bind->bindValue(':' . $k, $v, \PDO::PARAM_INT)
+                           : $bind->bindValue(':' . $k, $v, \PDO::PARAM_STR);
+    }
+
+    return $bind;
   }
 
 }
