@@ -17,17 +17,18 @@ abstract class Entity
       $this->conn = $conn;
   }
 
-  public function findAll($fields = '*')
+  public function findAll($fields = '*'): array
   {
     //pega os fildes que estão sendo passados
     $sql = 'SELECT ' . $fields . ' FROM '. $this->table; 
 
     $get = $this->conn->query($sql);
 
-    return $get->fetchAll(fetch_style: PDO::FETCH_ASSOC);
+    // return $get->fetchAll(fetch_style: PDO::FETCH_ASSOC);
+    return $get->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public function find(int $id)
+  public function find(int $id, $fields = '*'): array
   {
 
     $sql = 'SELECT * FROM products WHERE id = :id';
@@ -43,7 +44,7 @@ abstract class Entity
   }
   
   //vamos passar condições para a nossa query para o nosso array
-  public function where(array $conditions, $operator = ' AND ', $fields = '*')
+  public function where(array $conditions, $operator = ' AND ', $fields = '*') : array
   {
     //nosso select dinâmico
       $sql = 'SELECT ' . $fields . ' FROM ' . $this->table . ' WHERE ';
@@ -73,7 +74,7 @@ abstract class Entity
       //print $sql;
   }
 
-  public function insert($data){
+  public function insert($data): bool{
 
       $binds = array_keys($data);
       //$fields = implode(glue: ', ', $binds);
@@ -93,8 +94,39 @@ abstract class Entity
       //print $sql;
   }
 
-  public function update($data){
-    $sql = 'UPDATE ' . $this->table . ' SET name = :name'
+  public function update($data): bool{
+
+    // forma antiga de se escrever o if(!array_key_exists(key: 'id', $data))
+    //com este if garantimos quem eu quero informar
+    if(!array_key_exists('id', $data)){
+      throw new \Exception(message: 'É preciso informar um ID válido para update!');
+    }
+
+    $sql = 'UPDATE ' . $this->table . ' SET ';
+
+    $set = null;
+    $binds = array_keys($data);
+
+    foreach($binds as $v){
+      if($v !== 'id'){
+        $set .= is_null($set) ? $v . ' = :' . $v : ', ' . $v . ' = :' . $v;
+      }
+    }
+    
+    $sql .= $set . ', updated_at = NOW() WHERE id = :id';
+
+    $update = $this->bind($sql, $data);
+
+    return $update->execute();
+
+  }
+
+  public function delete(int $id): bool{
+    $sql = 'DELETE FROM ' . $this->table . ' WHERE id = :id';
+
+    $delete = $this->bind($sql, ['id' => $id]);
+
+    return $delete->execute();
   }
 
   private function bind($sql, $data){
